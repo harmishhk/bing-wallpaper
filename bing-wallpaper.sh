@@ -64,3 +64,10 @@ if [[ $head == "<!DOCTYPE" ]]; then
   curl -Lo "$PICTURE_DIR/$filename.jpg" $bing$url$res2
 fi
 
+# when succeed, immediatly set downloaded file as background image in ubuntu
+head=$(head -c 9 "$PICTURE_DIR/$filename.jpg")
+if [[ $head == "<!DOCTYPE" ]]; then
+  exit 0
+else
+  gsettings set org.gnome.desktop.background picture-uri file://$PICTURE_DIR/$filename.jpg
+fi
