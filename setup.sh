@@ -8,3 +8,8 @@ gawk "{ gsub(\"/DOWNLOAD_DIR\", \"$PWD\",\$0); print \$0 }" bing-wallpaper.sh > 
 mv tmp.tmp bing-wallpaper.sh
 chmod a+x bing-wallpaper.sh
 
+# setup crontab
+crontab bing-cron
+
+# and run bing-wallpaper.sh once
+./bing-wallpaper.sh
