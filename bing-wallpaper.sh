@@ -4,8 +4,8 @@
 # 02 Feb 2014
 
 # directories to keep wallpaper of the day and archive
-PICTURE_DIR="$HOME/.bing-wallpaper/pictures/"
-PICTURE_DIR_OLD="$HOME/.bing-wallpaper/pictures_old/"
+PICTURE_DIR="/DOWNLOAD_DIR/pictures/"
+PICTURE_DIR_OLD="/DOWNLOAD_DIR/pictures_old/"
 
 # attempt to create directories
 mkdir -p $PICTURE_DIR
