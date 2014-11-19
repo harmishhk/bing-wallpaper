@@ -12,8 +12,8 @@ mkdir -p $PICTURE_DIR
 mkdir -p $PICTURE_DIR_OLD
 
 # Commands
-PING="/sbin/ping"
-GAWK="/usr/local/bin/gawk"
+PING="/bin/ping"
+GAWK="/usr/bin/gawk"
 
 echo $(date)
 
