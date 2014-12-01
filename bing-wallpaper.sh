@@ -44,9 +44,18 @@ res2="_1366x768.jpg"
 url=$(curl -s "$xml" | $GAWK 'match($0, /<urlBase>(.*)<\/urlBase>/, u) {print u[1]}' )
 filename=$(echo $url | $GAWK 'match($0, /\/([^\/]*)_EN/, n){print n[1]}' )
 
+# export DBUS_SESSION_BUS_ADDRESS environment variable, required for 'gsettings' to work
+PID=$(pgrep gnome-session)
+export DBUS_SESSION_BUS_ADDRESS=$(grep -z DBUS_SESSION_BUS_ADDRESS /proc/$PID/environ|cut -d= -f2-)
+
 # check if file already exists
 if [ -e $PICTURE_DIR/$filename.jpg ]; then
   echo "File $filename.jpg already exists in the download directory."
+  # and check if $filename is set has current wallpaper
+  if [ "$PICTURE_DIR/$filename.jpg" != "$(gsettings get org.gnome.desktop.background picture-uri)" ]; then
+    # set downloaded file as wallpaper
+    gsettings set org.gnome.desktop.background picture-uri file://$PICTURE_DIR/$filename.jpg || echo "gsettings failed"
+  fi
   exit 0
 else
   # archive current wallpaper
@@ -69,5 +78,8 @@ head=$(head -c 9 "$PICTURE_DIR/$filename.jpg")
 if [[ $head == "<!DOCTYPE" ]]; then
   exit 0
 else
-  gsettings set org.gnome.desktop.background picture-uri file://$PICTURE_DIR/$filename.jpg
+  # set downloaded file as wallpaper
+  gsettings set org.gnome.desktop.background picture-uri file://$PICTURE_DIR/$filename.jpg || echo "gsettings failed"
 fi
+
+exit 0
