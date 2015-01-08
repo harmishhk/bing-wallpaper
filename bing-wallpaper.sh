@@ -46,7 +46,13 @@ filename=$(echo $url | $GAWK 'match($0, /\/([^\/]*)_EN/, n){print n[1]}' )
 
 # export DBUS_SESSION_BUS_ADDRESS environment variable, required for 'gsettings' to work
 PID=$(pgrep gnome-session)
-export DBUS_SESSION_BUS_ADDRESS=$(grep -z DBUS_SESSION_BUS_ADDRESS /proc/$PID/environ|cut -d= -f2-)
+# return if not in a genome-session
+if [ -z ${PID} ]; then
+    echo "not in gnome session"
+    exit 0
+else
+    export DBUS_SESSION_BUS_ADDRESS=$(grep -z DBUS_SESSION_BUS_ADDRESS /proc/$PID/environ|cut -d= -f2-)
+fi
 
 # check if file already exists
 if [ -e $PICTURE_DIR/$filename.jpg ]; then
