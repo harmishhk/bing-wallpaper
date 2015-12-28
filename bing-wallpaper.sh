@@ -2,22 +2,23 @@
 # Simple bing picture of the day downloader
 # Author: Przemysław Świercz <przemyslaw.swiercz@gmail.com>
 # 02 Feb 2014
+# Maintainer: Harmish Khambhaita <harmish.khambhaita@hotmail.com>
+# 28 Dec 2015
 
 # directories to keep wallpaper of the day and archive
 PICTURE_DIR="/DOWNLOAD_DIR/pictures/"
-PICTURE_DIR_OLD="/DOWNLOAD_DIR/pictures_old/"
 
 # attempt to create directories
 mkdir -p $PICTURE_DIR
-mkdir -p $PICTURE_DIR_OLD
 
-# Commands
+# setting commands
 PING="/bin/ping"
 GAWK="/usr/bin/gawk"
 
+# just for loggin purposes
 echo $(date)
 
-# test Internet connection
+# test internet connection
 connection_ok=0
 for i in {1..3}
 do
@@ -30,7 +31,7 @@ do
   fi
 done
 if [[ connection_ok -ne 1 ]]; then
-  echo -e "Internet is no more\n"
+  echo -e "internet is no more\n"
   exit 1
 fi
 
@@ -44,28 +45,10 @@ res2="_1366x768.jpg"
 url=$(curl -s "$xml" | $GAWK 'match($0, /<urlBase>(.*)<\/urlBase>/, u) {print u[1]}' )
 filename=$(echo $url | $GAWK 'match($0, /\/([^\/]*)_EN/, n){print n[1]}' )
 
-# export DBUS_SESSION_BUS_ADDRESS environment variable, required for 'gsettings' to work
-PID=$(pgrep gnome-session)
-# return if not in a genome-session
-if [ -z ${PID} ]; then
-    echo "not in gnome session"
-    exit 0
-else
-    export DBUS_SESSION_BUS_ADDRESS=$(grep -z DBUS_SESSION_BUS_ADDRESS /proc/$PID/environ|cut -d= -f2-)
-fi
-
 # check if file already exists
 if [ -e $PICTURE_DIR/$filename.jpg ]; then
   echo "File $filename.jpg already exists in the download directory."
-  # and check if $filename is set has current wallpaper
-  if [ "$PICTURE_DIR/$filename.jpg" != "$(gsettings get org.gnome.desktop.background picture-uri)" ]; then
-    # set downloaded file as wallpaper
-    gsettings set org.gnome.desktop.background picture-uri file://$PICTURE_DIR/$filename.jpg || echo "gsettings failed"
-  fi
   exit 0
-else
-  # archive current wallpaper
-  mv $PICTURE_DIR/* $PICTURE_DIR_OLD
 fi
 
 # download primary resulotion image
@@ -85,7 +68,9 @@ if [[ $head == "<!DOCTYPE" ]]; then
   exit 0
 else
   # set downloaded file as wallpaper
-  gsettings set org.gnome.desktop.background picture-uri file://$PICTURE_DIR/$filename.jpg || echo "gsettings failed"
+  feh --bg-scale $PICTURE_DIR/$filename.jpg
+  # remove old files
+  find $PICTURE_DIR -maxdepth 1  -type f  ! -name $filename.jpg | xargs --no-run-if-empty rm
 fi
 
 exit 0
