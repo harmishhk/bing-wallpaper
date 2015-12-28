@@ -5,13 +5,15 @@ This script downloads "Bing wallpaper of the day" and keeps history of previous 
 Adapted from [memek/bing-wallpaper](https://github.com/memek/bing-wallpaper).
 Based on [thejandroman](https://github.com/thejandroman/bing-Wallpaper) script.
 
-This bash script requires curl, grep, gawk and feh installed in your system.
+This bash script requires curl, grep, gawk and nitrogen (for i3wm) installed in your system.
 
 How to use?
 -----------
 
 Clone this repository and run
 `sh setup.sh`
+
+You need to add `exec nitrogen --restore` to you i3 configuration file.
 
 This script does the following
 * in **bing-cron** set path of the script. It defaults to DOWNLOAD_DIR/.bing-wallpaper/bing-wallpaper.sh

@@ -6,7 +6,7 @@
 # 28 Dec 2015
 
 # directories to keep wallpaper of the day and archive
-PICTURE_DIR="/DOWNLOAD_DIR/pictures/"
+PICTURE_DIR="/DOWNLOAD_DIR/pictures"
 
 # attempt to create directories
 mkdir -p $PICTURE_DIR
@@ -22,17 +22,17 @@ echo $(date)
 connection_ok=0
 for i in {1..3}
 do
-  test=$( $PING -q -c 1 8.8.4.4 | grep received | cut -d ' ' -f 4)
-  if [[ test -eq 1 ]]; then
-    connection_ok=1
-    break
-  else
-    sleep 8
-  fi
+    test=$( $PING -q -c 1 8.8.4.4 | grep received | cut -d ' ' -f 4)
+    if [[ test -eq 1 ]]; then
+        connection_ok=1
+        break
+    else
+        sleep 8
+    fi
 done
 if [[ connection_ok -ne 1 ]]; then
-  echo -e "internet is no more\n"
-  exit 1
+    echo -e "internet is no more\n"
+    exit
 fi
 
 # urls and primary/secondary resolution
@@ -47,30 +47,37 @@ filename=$(echo $url | $GAWK 'match($0, /\/([^\/]*)_EN/, n){print n[1]}' )
 
 # check if file already exists
 if [ -e $PICTURE_DIR/$filename.jpg ]; then
-  echo "File $filename.jpg already exists in the download directory."
-  exit 0
-fi
-
-# download primary resulotion image
-echo $bing$url$res
-curl -Lo "$PICTURE_DIR/$filename.jpg" $bing$url$res
-
-# if failed, try to download secondary resolution
-head=$(head -c 9 "$PICTURE_DIR/$filename.jpg")
-if [[ $head == "<!DOCTYPE" ]]; then
-  echo $bing$url$res2
-  curl -Lo "$PICTURE_DIR/$filename.jpg" $bing$url$res2
-fi
-
-# when succeed, immediatly set downloaded file as background image in ubuntu
-head=$(head -c 9 "$PICTURE_DIR/$filename.jpg")
-if [[ $head == "<!DOCTYPE" ]]; then
-  exit 0
+    echo "file $filename.jpg already exists in the download directory"
 else
-  # set downloaded file as wallpaper
-  feh --bg-scale $PICTURE_DIR/$filename.jpg
-  # remove old files
-  find $PICTURE_DIR -maxdepth 1  -type f  ! -name $filename.jpg | xargs --no-run-if-empty rm
+    # download primary resulotion image
+    echo $bing$url$res
+    curl -Lo "$PICTURE_DIR/$filename.jpg" $bing$url$res
+
+    # if failed, try to download secondary resolution
+    head=$(head -c 9 "$PICTURE_DIR/$filename.jpg")
+    if [[ $head == "<!DOCTYPE" ]]; then
+      echo $bing$url$res2
+      curl -Lo "$PICTURE_DIR/$filename.jpg" $bing$url$res2
+    fi
+
+    # if download fails, select last downloaded file
+    head=$(head -c 9 "$PICTURE_DIR/$filename.jpg")
+    if [[ $head == "<!DOCTYPE" ]]; then
+        filename=$(find $PICTURE_DIR -maxdepth 1 -type f -printf '%T@ %f\n' | sort -n | tail -1 | cut -f 2- -d' ' | cut -f -1 -d'.')
+    fi
 fi
 
-exit 0
+# set wallpaper in genome-session
+GS_PID=$(pgrep -x gnome-session)
+if [ ! -z ${GS_PID} ]; then
+    DBUS_SESSION_BUS_ADDRESS=$(grep -z DBUS_SESSION_BUS_ADDRESS /proc/$GS_PID/environ | cut -d= -f2-) gsettings set org.gnome.desktop.background picture-uri file://$PICTURE_DIR/$filename.jpg 2>&1
+fi
+
+# set wallpaper in i3
+I3_PID=$(pgrep -x i3)
+if [ ! -z ${I3_PID} ]; then
+    DISPLAY=:0 nitrogen --set-scaled --save $PICTURE_DIR/$filename.jpg 2>&1
+fi
+
+# remove old files
+find $PICTURE_DIR -maxdepth 1  -type f  ! -name $filename.jpg | xargs --no-run-if-empty rm
