@@ -31,7 +31,7 @@ do
     fi
 done
 if [[ connection_ok -ne 1 ]]; then
-    echo -e "internet is no more\n"
+    echo -e "internet is no more"
     exit
 fi
 
@@ -65,6 +65,12 @@ else
     if [[ $head == "<!DOCTYPE" ]]; then
         filename=$(find $PICTURE_DIR -maxdepth 1 -type f -printf '%T@ %f\n' | sort -n | tail -1 | cut -f 2- -d' ' | cut -f -1 -d'.')
     fi
+fi
+
+# last check for file existance
+if [ ! -f $PICTURE_DIR/$filename.jpg ]; then
+    echo "picture file not found!"
+    exit
 fi
 
 # set wallpaper in genome-session
