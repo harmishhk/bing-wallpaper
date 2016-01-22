@@ -55,14 +55,14 @@ else
 
     # if failed, try to download secondary resolution
     head=$(head -c 9 "$PICTURE_DIR/$filename.jpg")
-    if [[ $head == "<!DOCTYPE" ]]; then
+    if [ ! -e "$PICTURE_DIR/$filename.jpg" -o "$head" == "<!DOCTYPE" ]; then
       echo $bing$url$res2
       curl -Lo "$PICTURE_DIR/$filename.jpg" $bing$url$res2
     fi
 
     # if download fails, select last downloaded file
     head=$(head -c 9 "$PICTURE_DIR/$filename.jpg")
-    if [[ $head == "<!DOCTYPE" ]]; then
+    if [ ! -e "$PICTURE_DIR/$filename.jpg" -o "$head" == "<!DOCTYPE" ]; then
         filename=$(find $PICTURE_DIR -maxdepth 1 -type f -printf '%T@ %f\n' | sort -n | tail -1 | cut -f 2- -d' ' | cut -f -1 -d'.')
     fi
 fi
