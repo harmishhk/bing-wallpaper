@@ -80,10 +80,12 @@ if [ ! -z ${GS_PID} ]; then
 fi
 
 # set wallpaper in i3
-I3_PID=$(pgrep -x i3)
-if [ ! -z ${I3_PID} ]; then
-    DISPLAY=:0 nitrogen --set-scaled --save $PICTURE_DIR/$filename.jpg 2>&1
-fi
+# I3_PID=$(pgrep -x i3)
+# if [ ! -z ${I3_PID} ]; then
+    feh --bg-scale $PICTURE_DIR/$filename.jpg
+    chmod a+rx $HOME/.fehbg
+# fi
+
 
 # remove old files
 find $PICTURE_DIR -maxdepth 1  -type f  ! -name $filename.jpg | xargs --no-run-if-empty rm
