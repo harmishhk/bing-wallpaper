@@ -67,9 +67,13 @@ else
     fi
 fi
 
-# last check for file existance
+# last check for file existance and size
 if [ ! -f $PICTURE_DIR/$filename.jpg ]; then
     echo "picture file not found!"
+    exit
+fi
+if [ $(wc -c <"$PICTURE_DIR/$filename.jpg") -eq 0 ]; then
+    echo "picture file is empty!"
     exit
 fi
 
