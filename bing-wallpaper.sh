@@ -12,7 +12,7 @@ PICTURE_DIR="/DOWNLOAD_DIR/pictures"
 mkdir -p $PICTURE_DIR
 
 # setting commands
-PING="/bin/ping"
+WGET="/usr/bin/wget"
 GAWK="/usr/bin/gawk"
 
 # just for loggin purposes
@@ -22,8 +22,8 @@ echo $(date)
 connection_ok=0
 for i in {1..3}
 do
-    test=$( $PING -q -c 1 8.8.4.4 | grep received | cut -d ' ' -f 4)
-    if [[ test -eq 1 ]]; then
+    test = $( $WGET -q --spider http://bing.com )
+    if [[ test -eq 0 ]]; then
         connection_ok=1
         break
     else
