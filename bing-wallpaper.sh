@@ -78,7 +78,7 @@ if [ $(wc -c <"$PICTURE_DIR/$filename.jpg") -eq 0 ]; then
 fi
 
 # set wallpaper in genome-session
-GS_PID=$(pgrep -x gnome-session)
+GS_PID=$(pgrep gnome-session)
 if [ ! -z ${GS_PID} ]; then
     DBUS_SESSION_BUS_ADDRESS=$(grep -z DBUS_SESSION_BUS_ADDRESS /proc/$GS_PID/environ | cut -d= -f2-) gsettings set org.gnome.desktop.background picture-uri file://$PICTURE_DIR/$filename.jpg 2>&1
 fi
