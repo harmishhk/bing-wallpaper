@@ -37,28 +37,19 @@ fi
 
 # urls and primary/secondary resolution
 bing="http://www.bing.com"
-xml="http://www.bing.com/HPImageArchive.aspx?format=xml&idx=0&n=1&mkt=en-US"
-res="_1920x1200.jpg"
-res2="_1366x768.jpg"
+json="http://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&mkt=en-US"
 
 # extract image url and filename
-url=$(curl -s "$xml" | $GAWK 'match($0, /<urlBase>(.*)<\/urlBase>/, u) {print u[1]}' )
+url=$(curl -s "$json" | jq -r '.images|.[0]|.url')
 filename=$(echo $url | $GAWK 'match($0, /\/([^\/]*)_EN/, n){print n[1]}' )
 
 # check if file already exists
 if [ -e $PICTURE_DIR/$filename.jpg ]; then
     echo "file $filename.jpg already exists in the download directory"
 else
-    # download primary resulotion image
-    echo $bing$url$res
-    curl -Lo "$PICTURE_DIR/$filename.jpg" $bing$url$res
-
-    # if failed, try to download secondary resolution
-    head=$(head -c 9 "$PICTURE_DIR/$filename.jpg")
-    if [ ! -e "$PICTURE_DIR/$filename.jpg" -o "$head" == "<!DOCTYPE" ]; then
-      echo $bing$url$res2
-      curl -Lo "$PICTURE_DIR/$filename.jpg" $bing$url$res2
-    fi
+    # download image
+    echo "downloading $bing$url"
+    curl -Lo "$PICTURE_DIR/$filename.jpg" $bing$url
 
     # if download fails, select last downloaded file
     head=$(head -c 9 "$PICTURE_DIR/$filename.jpg")

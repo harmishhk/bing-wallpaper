@@ -5,7 +5,7 @@ This script downloads "Bing wallpaper of the day" and keeps history of previous 
 Adapted from [memek/bing-wallpaper](https://github.com/memek/bing-wallpaper).
 Based on [thejandroman](https://github.com/thejandroman/bing-Wallpaper) script.
 
-This bash script requires curl, grep, gawk and nitrogen (for i3wm) installed in your system.
+This bash script requires curl, grep, gawk, jq and nitrogen (for i3wm) installed in your system.
 
 How to use?
 -----------
